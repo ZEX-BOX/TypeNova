@@ -232,3 +232,31 @@ body:after{width:290px;height:290px;right:4%;bottom:8%;background:#3b9db8;animat
 .app-shell[data-theme="light"] .page-footer span{color:#9c83ce}
 @media(max-width:760px){.topbar-actions{gap:7px}.theme-toggle{padding:8px 9px}.theme-toggle>span:last-child{display:none}}
 @media(prefers-reduced-motion:reduce){.theme-toggle{transition:none}}
+
+
+/* Global light theme override: driven by the document theme attribute */
+html[data-theme="light"],html[data-theme="light"] body{color-scheme:light;background:#f3f5fb!important;color:#252941}
+html[data-theme="light"] body{background:radial-gradient(ellipse at 72% 2%,#e5ddfa 0,transparent 35%),radial-gradient(ellipse at 4% 72%,#e2eff5 0,transparent 34%),#f3f5fb!important}
+html[data-theme="light"] .app-shell{background:transparent!important;color:#252941!important}
+html[data-theme="light"] .app-shell .sidebar{background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(239,242,251,.96))!important;border-color:#dce1ee!important}
+html[data-theme="light"] .app-shell .main-area{color:#252941}
+html[data-theme="light"] .app-shell .topbar{border-color:#dfe3ef}
+html[data-theme="light"] .app-shell .breadcrumb,html[data-theme="light"] .app-shell .side-label,html[data-theme="light"] .app-shell .eyebrow,html[data-theme="light"] .app-shell .subtle-label{color:#777e98}
+html[data-theme="light"] .app-shell .nav-item{color:#626984}
+html[data-theme="light"] .app-shell .nav-item--active{color:#4f3b83;background:linear-gradient(100deg,#eee8ff,#f8f5ff);border-color:#d9cef7}
+html[data-theme="light"] .app-shell .practice-card,html[data-theme="light"] .app-shell .lesson-card,html[data-theme="light"] .app-shell .history-card,html[data-theme="light"] .app-shell .metric-card{background:linear-gradient(145deg,rgba(255,255,255,.97),rgba(245,247,253,.94))!important;border-color:#dce1ed!important;color:#30354d!important;box-shadow:0 14px 38px rgba(50,60,100,.08)!important}
+html[data-theme="light"] .app-shell .typing-area{background:#f0f2f9!important;border-color:#dce1ed!important;color:#444b65}
+html[data-theme="light"] .app-shell .typing-input{background:#fff!important;color:#303650!important;border-color:#d8deed!important}
+html[data-theme="light"] .app-shell .letter--pending{color:#9da4b9}
+html[data-theme="light"] .app-shell .letter--correct{color:#333d59}
+html[data-theme="light"] .app-shell .practice-footer,html[data-theme="light"] .app-shell .hero-subtitle{color:#737b95}
+html[data-theme="light"] .app-shell .mode-switch{background:#edf0f8;border-color:#dce1ee}
+html[data-theme="light"] .app-shell .mode-switch button{color:#737b95}
+html[data-theme="light"] .app-shell .mode-switch button.selected{background:#ddd4f5;color:#4c3b7d}
+html[data-theme="light"] .app-shell .top-pill,html[data-theme="light"] .app-shell .theme-toggle{background:rgba(255,255,255,.9)!important;color:#575077!important;border-color:#dcd8ee!important}
+html[data-theme="light"] .app-shell .outline-button,html[data-theme="light"] .app-shell .quiet-button{background:#fff!important;color:#5e527f!important;border-color:#d8d4e8!important}
+html[data-theme="light"] .app-shell .metric-card strong{background:linear-gradient(100deg,#6251a0,#9872c2 55%,#c26c9b);background-clip:text;-webkit-background-clip:text;color:transparent}
+html[data-theme="light"] .app-shell .lesson-card h3,html[data-theme="light"] .app-shell .history-row strong{color:#303650}
+html[data-theme="light"] .app-shell .lesson-card p,html[data-theme="light"] .app-shell .history-row span{color:#747c96}
+html[data-theme="light"] .app-shell .mission-victory{background:linear-gradient(110deg,#e8f1e1,#f7fbf3)!important;border-color:#c7d9bb!important}
+html[data-theme="light"] .app-shell .mission-victory strong{color:#3d5c38}
