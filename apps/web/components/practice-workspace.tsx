@@ -12,7 +12,7 @@ export function PracticeWorkspace(){
  const [view,setView]=useState<View>("practice"),[mode,setMode]=useState<Mode>("practice"),[lessonId,setLessonId]=useState("focus");
  const [typed,setTyped]=useState(""),[startedAt,setStartedAt]=useState<number|null>(null),[now,setNow]=useState(Date.now()),[finished,setFinished]=useState(false);
  const [sessions,setSessions]=useState<Session[]>([]),[loaded,setLoaded]=useState(false);
- const lesson=LESSONS.find(x=>x.id===lessonId)??LESSONS[0],passage=lesson.text;
+ const lesson=LESSONS.find(x=>x.id===lessonId)??LESSONS[0]!,passage=lesson.text;
  const elapsed=startedAt===null?0:Math.max(0,(now-startedAt)/1000),remaining=Math.max(0,60-elapsed);
  const metrics=useMemo(()=>calculateLiveMetrics(passage,typed,elapsed),[passage,typed,elapsed]);
  const complete=finished||(mode==="practice"&&typed.length>=passage.length);
