@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent } from "react";
+import { strFromU8, unzipSync } from "fflate";
 import { calculateLiveMetrics } from "@typenova/typing-engine";
 
 type Book = { id:string; title:string; author:string; category:string; description:string; accent:string; content:string; custom?:boolean };
@@ -137,15 +138,40 @@ export function PracticeWorkspace(){
  }
  async function importText(event:ChangeEvent<HTMLInputElement>){
   const file=event.target.files?.[0];if(!file)return;
-  if(!/\.(txt|md)$/i.test(file.name)){setNotice("For now, import a .txt or .md text file.");event.target.value="";return}
-  if(file.size>2_000_000){setNotice("Please keep imported books under 2 MB.");event.target.value="";return}
-  const text=await file.text();
-  const clean=text.replace(/\r/g,"").trim();
-  if(clean.length<80){setNotice("That file is too short to make a reading book.");event.target.value="";return}
-  const title=file.name.replace(/\.(txt|md)$/i,"").replace(/[-_]/g," ");
-  const book:Book={id:"custom-"+Date.now(),title,author:"Your import",category:"My books",description:"Your own imported reading material.",accent:"ink",content:clean,custom:true};
-  setPersonalBooks(old=>{const next=[book,...old];try{localStorage.setItem(LIBRARY_STORE,JSON.stringify(next))}catch{}return next});
-  setCategory("My books");setQuery("");setNotice("Your book has been added to the library.");event.target.value="";
+  const isEpub=/\.epub$/i.test(file.name);
+  if(!isEpub&&!/\.(txt|md)$/i.test(file.name)){setNotice("Choose an EPUB, TXT or Markdown file.");event.target.value="";return}
+  if(file.size>(isEpub?10_000_000:2_000_000)){setNotice(isEpub?"Please keep EPUB files under 10 MB.":"Please keep text files under 2 MB.");event.target.value="";return}
+  try{
+   let clean="",title=file.name.replace(/\.(epub|txt|md)$/i,"").replace(/[-_]/g," "),author="Your import";
+   if(isEpub){
+    const archive=unzipSync(new Uint8Array(await file.arrayBuffer()));
+    const container=archive["META-INF/container.xml"];
+    if(!container)throw new Error("This EPUB is missing its container file.");
+    const containerDoc=new DOMParser().parseFromString(strFromU8(container),"application/xml");
+    const opfPath=containerDoc.getElementsByTagName("rootfile")[0]?.getAttribute("full-path");
+    if(!opfPath)throw new Error("Could not locate the EPUB book package.");
+    const opfBytes=archive[opfPath];if(!opfBytes)throw new Error("The EPUB package file could not be read.");
+    const opfDoc=new DOMParser().parseFromString(strFromU8(opfBytes),"application/xml");
+    const metadataTitle=opfDoc.getElementsByTagNameNS("*","title")[0]?.textContent?.trim();
+    const metadataAuthor=opfDoc.getElementsByTagNameNS("*","creator")[0]?.textContent?.trim();
+    if(metadataTitle)title=metadataTitle;if(metadataAuthor)author=metadataAuthor;
+    const manifest=new Map<string,string>();
+    Array.from(opfDoc.getElementsByTagNameNS("*","item")).forEach(item=>{const id=item.getAttribute("id"),href=item.getAttribute("href");if(id&&href)manifest.set(id,href)});
+    const opfDirectory=opfPath.includes("/")?opfPath.slice(0,opfPath.lastIndexOf("/")):"";
+    const resolvePath=(href:string)=>{const parts=(opfDirectory?opfDirectory+"/":"").split("/").concat(decodeURIComponent(href.split("#")[0]!.split("?")[0]! ).split("/"));const out:string[]=[];for(const part of parts){if(!part||part===".")continue;if(part==="..")out.pop();else out.push(part)}return out.join("/")};
+    const spine=Array.from(opfDoc.getElementsByTagNameNS("*","itemref")).map(item=>manifest.get(item.getAttribute("idref")??"")).filter((href):href is string=>!!href);
+    const sections:string[]=[];
+    for(const href of spine){const bytes=archive[resolvePath(href)];if(!bytes)continue;const doc=new DOMParser().parseFromString(strFromU8(bytes),"text/html");doc.querySelectorAll("script,style,nav").forEach(node=>node.remove());const blocks=Array.from(doc.body.querySelectorAll("h1,h2,h3,h4,h5,h6,p,li")).map(node=>(node.textContent??"").replace(/\s+/g," ").trim()).filter(Boolean);const body=blocks.length?blocks.join("\n\n"):(doc.body.textContent??"").replace(/\s+/g," ").trim();if(body)sections.push(body)}
+    clean=sections.join("\n\n");
+   }else{clean=(await file.text()).replace(/\r/g,"").trim()}
+   clean=clean.trim();
+   if(clean.length<80)throw new Error("This file does not contain enough readable text.");
+   if(clean.length>1_500_000)throw new Error("The extracted book is too large for local browser storage.");
+   const book:Book={id:"custom-"+Date.now(),title,author,category:"My books",description:"Your own imported reading material.",accent:"ink",content:clean,custom:true};
+   setPersonalBooks(old=>{const next=[book,...old];try{localStorage.setItem(LIBRARY_STORE,JSON.stringify(next))}catch{}return next});
+   setCategory("My books");setQuery("");setNotice("Your book has been added to the library.");
+  }catch(error){setNotice(error instanceof Error?error.message:"Could not import this book. Please check the file.");}
+  event.target.value="";
  }
  function exportBackup(){
   const payload={version:1,progress,sessions,personalBooks};
@@ -155,7 +181,7 @@ export function PracticeWorkspace(){
  function toggleTheme(){setTheme(value=>value==="dark"?"light":"dark")}
  function renderLibrary(){
   return <section className="book-library">
-   <div className="library-hero"><div><span className="book-eyebrow">A QUIETER KIND OF PROGRESS</span><h1>Read a little.<br/><em>Type a lot.</em></h1><p>Build a daily typing habit with the books you love.</p><div className="library-actions"><button className="book-primary" onClick={()=>openBook(STARTER_BOOKS[0]!,"type")}>Continue reading <span>↗</span></button><label className="book-secondary">＋ Import a book<input type="file" accept=".txt,.md,text/plain,text/markdown" onChange={importText} hidden/></label></div></div><div className="library-hero-art"><div className="hero-book hero-book-one"/><div className="hero-book hero-book-two"/><div className="hero-book hero-book-three"/><span>THE JOY OF<br/>SLOW READING</span></div></div>
+   <div className="library-hero"><div><span className="book-eyebrow">A QUIETER KIND OF PROGRESS</span><h1>Read a little.<br/><em>Type a lot.</em></h1><p>Build a daily typing habit with the books you love.</p><div className="library-actions"><button className="book-primary" onClick={()=>openBook(STARTER_BOOKS[0]!,"type")}>Continue reading <span>↗</span></button><label className="book-secondary">＋ Import EPUB / TXT<input type="file" accept=".epub,.txt,.md,application/epub+zip,text/plain,text/markdown" onChange={importText} hidden/></label></div></div><div className="library-hero-art"><div className="hero-book hero-book-one"/><div className="hero-book hero-book-two"/><div className="hero-book hero-book-three"/><span>THE JOY OF<br/>SLOW READING</span></div></div>
    <div className="library-toolbar"><div><span className="book-eyebrow">YOUR BOOKSHELF</span><h2>Find your next chapter</h2></div><input className="book-search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search books or authors…" aria-label="Search books"/></div>
    <div className="category-tabs">{CATEGORIES.map(item=><button key={item} className={category===item?"active":""} onClick={()=>setCategory(item)}>{item}</button>)}</div>
    <div className="book-grid">{filtered.map(book=><article className="library-book-card" key={book.id}><button className={"book-cover cover-"+book.accent} onClick={()=>openBook(book,"type")} aria-label={"Open "+book.title}><span className="cover-top">{book.custom?"YOUR COPY":"A TYPE NOVA READING EDITION"}</span><span className="cover-ornament">✳</span><strong>{book.title}</strong><small>{book.author}</small><i/></button><div className="book-card-info"><div><span>{book.category}</span><small>{Math.min(100,Math.round(((progress[book.id]??0)/paragraphs(book).length)*100))}% complete</small></div><h3>{book.title}</h3><p>{book.author}</p><div className="book-card-actions"><button onClick={()=>openBook(book,"type")}>Type this book</button><button onClick={()=>openBook(book,"read")}>Read</button></div></div></article>)}</div>
