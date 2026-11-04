@@ -4,7 +4,24 @@ import { calculateLiveMetrics } from "@typenova/typing-engine";
 const LESSONS = [
  {id:"focus",title:"The art of focus",level:"BEGINNER",text:"Great things are built one focused keystroke at a time. Stay relaxed, keep your rhythm, and let accuracy lead the way."},
  {id:"journey",title:"Your next chapter",level:"BEGINNER",text:"Every expert was once a beginner. Practice with patience, learn from every mistake, and keep moving forward."},
- {id:"discipline",title:"Quiet discipline",level:"INTERMEDIATE",text:"Small daily improvements create remarkable results. Consistency turns a difficult skill into a natural habit."}
+ {id:"discipline",title:"Quiet discipline",level:"INTERMEDIATE",text:"Small daily improvements create remarkable results. Consistency turns a difficult skill into a natural habit."},
+ {id:"morning",title:"A new morning",level:"BEGINNER",text:"The sun rises over the quiet city. A fresh day brings fresh chances to learn, explore, and become better than yesterday."},
+ {id:"starlight",title:"Chasing starlight",level:"BEGINNER",text:"Beyond the clouds, countless stars shine in the night sky. Keep looking ahead, even when the path seems dark."},
+ {id:"adventure",title:"The first adventure",level:"BEGINNER",text:"Mika opened the old map and found a small golden mark near the mountains. The journey would be difficult, but curiosity made every step exciting."},
+ {id:"ocean",title:"Ocean of ideas",level:"INTERMEDIATE",text:"Waves travel across the endless ocean, carrying stories from distant shores. Some arrive gently, while others reshape the coast."},
+ {id:"craft",title:"Master your craft",level:"INTERMEDIATE",text:"Skill is not magic. It grows through attention, honest feedback, and the courage to repeat a difficult task until it feels natural."},
+ {id:"neon",title:"Neon city nights",level:"INTERMEDIATE",text:"Rain reflected the glowing signs across the empty street. A train passed overhead, and the whole city seemed to pulse with electric light."},
+ {id:"library",title:"The hidden library",level:"BEGINNER",text:"Behind a narrow wooden door stood a library filled with dusty books. Each page held a mystery waiting for someone brave enough to read it."},
+ {id:"future",title:"Build the future",level:"INTERMEDIATE",text:"Tomorrow belongs to people who keep experimenting today. Ask better questions, test your ideas, and turn small discoveries into useful things."},
+ {id:"forest",title:"Whispers in the forest",level:"INTERMEDIATE",text:"Tall trees swayed above the winding trail. Birds called from hidden branches, while soft sunlight painted moving patterns on the ground."},
+ {id:"courage",title:"Choose courage",level:"BEGINNER",text:"Courage does not mean having no fear. It means taking the next step, learning from the result, and trying again with a stronger heart."},
+ {id:"robot",title:"A curious machine",level:"INTERMEDIATE",text:"The little robot studied the workshop every evening. It learned to sort the tools, repair a broken lamp, and finally build something of its own."},
+ {id:"rain",title:"After the rain",level:"BEGINNER",text:"The storm moved away, leaving fresh air and shining streets behind. Drops of water sparkled on the leaves as the clouds slowly opened."},
+ {id:"tournament",title:"The final round",level:"ADVANCED",text:"The tournament hall grew silent as the final player took a seat. Every movement mattered now, and careful preparation would decide the result."},
+ {id:"signal",title:"Signal from space",level:"ADVANCED",text:"At midnight the observatory received a repeating signal from beyond the moon. The team checked every instrument twice before sharing the discovery."},
+ {id:"innovation",title:"Ideas into action",level:"ADVANCED",text:"A promising idea becomes valuable when someone builds it, tests it, and improves it. Progress comes from clear thinking followed by consistent action."},
+ {id:"mountain",title:"Above the clouds",level:"INTERMEDIATE",text:"The climbers reached the ridge just before sunrise. Far below, the valley was hidden beneath clouds, and the distant peaks glowed in gold."},
+ {id:"champion",title:"The quiet champion",level:"ADVANCED",text:"No one noticed the extra practice after school or the careful review of every mistake. On competition day, that quiet preparation made all the difference."}
 ];
 type View="practice"|"learn"|"insights"; type Mode="practice"|"speed";
 type Session={date:string;wpm:number;accuracy:number;mode:Mode};
@@ -20,7 +37,7 @@ export function PracticeWorkspace(){
  useEffect(()=>{if(startedAt===null||finished)return;const id=window.setInterval(()=>setNow(Date.now()),200);return()=>window.clearInterval(id)},[startedAt,finished]);
  function finish(){if(finished)return;if(typed.length){const result=calculateLiveMetrics(passage,typed,elapsed);const row:Session={date:new Date().toISOString(),wpm:result.wpm,accuracy:result.accuracy,mode};setSessions(old=>{const next=[row,...old].slice(0,100);try{localStorage.setItem("typenova:sessions",JSON.stringify(next))}catch{}return next})}setFinished(true)}
  useEffect(()=>{if(mode==="speed"&&startedAt!==null&&remaining<=0&&!finished)finish()},[mode,startedAt,remaining,finished]);
- function begin(nextMode:Mode="practice",nextLesson=lessonId){setLessonId(nextLesson);setMode(nextMode);setTyped("");setStartedAt(null);setNow(Date.now());setFinished(false);setView("practice")}
+ function begin(nextMode:Mode="practice",nextLesson?:string){const pool=nextLesson?LESSONS.filter(x=>x.id===nextLesson):LESSONS.filter(x=>x.id!==lessonId);const chosen=pool.length?pool[Math.floor(Math.random()*pool.length)]:LESSONS[Math.floor(Math.random()*LESSONS.length)];setLessonId(chosen.id);setMode(nextMode);setTyped("");setStartedAt(null);setNow(Date.now());setFinished(false);setView("practice")}
  function change(value:string){if(finished)return;if(startedAt===null&&value.length)setStartedAt(Date.now());setTyped(value.slice(0,passage.length))}
  const chars=passage.split("").map((c,i)=>{const v=typed[i],state=v===undefined?(i===typed.length?"current":"pending"):v===c?"correct":"incorrect";return <span className={"letter letter--"+state} key={i}>{c}</span>});
  const best=sessions.length?Math.max(...sessions.map(x=>x.wpm)):0,avg=sessions.length?Math.round(sessions.reduce((a,x)=>a+x.accuracy,0)/sessions.length):0;
