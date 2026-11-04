@@ -1,4 +1,4 @@
-# TypeNova!
+# TypeNova
 
 A complete, original typing-learning and productivity platform for web and desktop.
 
