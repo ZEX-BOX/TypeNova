@@ -46,3 +46,34 @@ body:after{width:290px;height:290px;right:4%;bottom:8%;background:#3b9db8;animat
 .top-pill{background:rgba(24,24,47,.5);border-color:rgba(213,194,255,.2)}
 .completion-note{background:rgba(44,35,65,.62);border-color:rgba(220,180,255,.35)}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+
+
+/* Anime cinematic atmosphere — sakura, stardust and magical UI */
+.hero-visual{isolation:isolate}
+.hero-visual:before{content:"";position:absolute;inset:-35%;z-index:0;pointer-events:none;background:conic-gradient(from 0deg,transparent 0 22%,rgba(255,174,220,.13) 27%,transparent 33% 58%,rgba(158,199,255,.12) 64%,transparent 70%);filter:blur(16px);animation:anime-aura-spin 28s linear infinite}
+.hero-visual:after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(2px 2px at 12% 24%,#fff 50%,transparent 60%),radial-gradient(1px 1px at 83% 18%,#ffe4b5 50%,transparent 60%),radial-gradient(2px 2px at 74% 76%,#d9c4ff 50%,transparent 60%),radial-gradient(1px 1px at 28% 80%,#fff 50%,transparent 60%),radial-gradient(1px 1px at 91% 51%,#fff 50%,transparent 60%);background-size:190px 150px;opacity:.8;animation:starfield-drift 18s linear infinite}
+@keyframes anime-aura-spin{to{transform:rotate(360deg)}}
+@keyframes starfield-drift{0%{background-position:0 0}100%{background-position:190px -150px}}
+.character,.character-halo,.visual-ring,.visual-star,.visual-tag{z-index:1}
+.character{filter:drop-shadow(0 8px 16px rgba(8,7,22,.35))}
+.character:after{content:"";position:absolute;z-index:4;left:8px;top:5px;width:12px;height:12px;border-radius:50%;background:#fff;filter:blur(8px);opacity:.65;animation:anime-spark 3s ease-in-out infinite}
+@keyframes anime-spark{0%,100%{transform:translate(0,0) scale(.6);opacity:.2}50%{transform:translate(62px,55px) scale(1.5);opacity:.9}}
+.sidebar-art{isolation:isolate}
+.sidebar-art:before,.sidebar-art:after{content:"";position:absolute;z-index:0;pointer-events:none;border-radius:50%;background:rgba(255,211,235,.85);box-shadow:36px 30px 0 -2px rgba(255,211,235,.7),88px 8px 0 -1px rgba(255,255,255,.8),145px 58px 0 -2px rgba(255,211,235,.75),188px 18px 0 -1px rgba(202,185,255,.9),60px 105px 0 -2px rgba(255,255,255,.7);width:6px;height:9px;filter:blur(.2px);opacity:.7;animation:sakura-drift 12s linear infinite}
+.sidebar-art:before{top:-15px;left:10px;transform:rotate(35deg)}
+.sidebar-art:after{top:-45px;left:80px;animation-delay:-6s;animation-duration:16s;opacity:.45}
+@keyframes sakura-drift{0%{transform:translate3d(0,-15px,0) rotate(0deg)}50%{transform:translate3d(22px,105px,0) rotate(170deg)}100%{transform:translate3d(-8px,235px,0) rotate(360deg)}}
+.brand-mark{position:relative;overflow:hidden;animation:brand-breathe 4s ease-in-out infinite}
+.brand-mark:after{content:"";position:absolute;inset:-60%;background:linear-gradient(110deg,transparent 42%,rgba(255,255,255,.55) 50%,transparent 58%);transform:translateX(-70%) rotate(20deg);animation:brand-shine 5s ease-in-out infinite}
+@keyframes brand-breathe{0%,100%{box-shadow:0 0 18px rgba(167,139,250,.3)}50%{box-shadow:0 0 32px rgba(255,153,213,.5)}}
+@keyframes brand-shine{0%,55%{transform:translateX(-70%) rotate(20deg)}85%,100%{transform:translateX(70%) rotate(20deg)}}
+.hero-copy h1 span,.content-view h1 span{background-size:200% auto;animation:anime-title-shimmer 7s ease-in-out infinite}
+@keyframes anime-title-shimmer{0%,100%{background-position:0% center}50%{background-position:100% center}}
+.practice-card{transition:transform .35s,border-color .35s,box-shadow .35s}
+.practice-card:focus-within{border-color:rgba(208,169,255,.5);box-shadow:inset 0 1px rgba(255,255,255,.15),0 18px 55px rgba(0,0,0,.22),0 0 35px rgba(161,122,235,.12)}
+.letter--correct{transition:color .12s,text-shadow .12s}
+.letter--incorrect{animation:mistake-nudge .18s ease-in-out}
+@keyframes mistake-nudge{0%,100%{transform:translateX(0)}35%{transform:translateX(-2px)}70%{transform:translateX(2px)}}
+.metric-card strong{background:linear-gradient(100deg,#fff,#d7bdff 45%,#ffb8d9);background-clip:text;-webkit-background-clip:text;color:transparent}
+@media(max-width:760px){.hero-visual:before{opacity:.6}.hero-visual:after{background-size:140px 120px}}
+@media(prefers-reduced-motion:reduce){.hero-visual:before,.hero-visual:after,.sidebar-art:before,.sidebar-art:after,.brand-mark,.brand-mark:after,.character:after{animation:none!important}}
