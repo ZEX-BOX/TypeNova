@@ -1,6 +1,7 @@
 "use client";
 
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { ChangeEvent } from "react";
 import { calculateLiveMetrics } from "@typenova/typing-engine";
 
 type Book = { id:string; title:string; author:string; category:string; description:string; accent:string; content:string; custom?:boolean };
@@ -113,7 +114,7 @@ export function PracticeWorkspace(){
   setProgress(old=>{const next={...old,[bookId]:index};try{localStorage.setItem(STORE,JSON.stringify(next))}catch{}return next});
  }
  function openBook(book:Book,nextMode:"read"|"type"="type"){
-  setActiveId(book.id);setParagraphIndex(progress[book.id]??0);setTyped("");setStartedAt(null);setNow(Date.now());setMode(nextMode);setView("reader");
+  setActiveId(book.id);setParagraphIndex(Math.min(progress[book.id]??0,Math.max(0,paragraphs(book).length-1)));setTyped("");setStartedAt(null);setNow(Date.now());setMode(nextMode);setView("reader");
  }
  function nextParagraph(){
   const next=Math.min(paragraphIndex+1,chunks.length);
@@ -168,7 +169,7 @@ export function PracticeWorkspace(){
    <div className="reader-progress"><span>PARAGRAPH {paragraphIndex+1} OF {chunks.length}</span><div><i style={{width:((paragraphIndex+(completed?1:0))/chunks.length*100)+"%"}}/></div><span>{Math.round((paragraphIndex/chunks.length)*100)}%</span></div>
    <div className="reader-paper"><div className="paper-heading"><span>{activeBook.category.toUpperCase()} · {activeBook.author.toUpperCase()}</span><h1>{activeBook.title}</h1><small>CHAPTER EXCERPT</small></div>
     {mode==="read"?<div className="reading-text" style={{fontSize,lineHeight:lineSpacing}}>{passage}</div>:<><div className="typing-instruction">TYPE THE PASSAGE BELOW · YOUR PROGRESS SAVES AUTOMATICALLY</div><div className="book-typing-text" style={{fontSize,lineHeight:lineSpacing}}>{chars}</div><textarea className="book-typing-input" value={typed} onChange={e=>onTyping(e.target.value)} placeholder="Start typing the paragraph here…" autoFocus spellCheck={false} autoCapitalize="off" autoCorrect="off" onPaste={e=>e.preventDefault()} aria-label="Type the displayed paragraph"/></>}
-    <div className="paper-controls"><div className="reading-settings"><label>Text size <input type="range" min="16" max="26" value={fontSize} onChange={e=>setFontSize(Number(e.target.value))}/></label><label>Spacing <input type="range" min="1.4" max="2.2" step=".05" value={lineSpacing} onChange={e=>setLineSpacing(Number(e.target.value))}/></label></div><button className="book-primary" onClick={mode==="read"?nextParagraph:finishParagraph} disabled={mode==="type"&&!typed.trim()}>{paragraphIndex+1===chunks.length?"Finish book":"Next paragraph"} <span>→</span></button></div>
+    <div className="paper-controls"><div className="reading-settings"><label>Text size <input type="range" min="16" max="26" value={fontSize} onChange={e=>setFontSize(Number(e.target.value))}/></label><label>Spacing <input type="range" min="1.4" max="2.2" step=".05" value={lineSpacing} onChange={e=>setLineSpacing(Number(e.target.value))}/></label></div><button className="book-primary" onClick={mode==="read"?nextParagraph:finishParagraph} disabled={mode==="type"&&!completed}>{paragraphIndex+1===chunks.length?"Finish book":"Next paragraph"} <span>→</span></button></div>
    </div>
    {mode==="type"&&<div className="reader-live-stats"><div><span>LIVE SPEED</span><strong>{metrics.wpm} <small>WPM</small></strong></div><div><span>ACCURACY</span><strong>{metrics.accuracy}<small>%</small></strong></div><div><span>TIME</span><strong>{clock(elapsed)}</strong></div><div><span>CHARACTERS</span><strong>{typed.length}<small>/{passage.length}</small></strong></div><div className="reader-stat-actions"><button onClick={()=>{setTyped("");setStartedAt(null);setNow(Date.now())}}>Reset paragraph</button></div></div>}
   </section>
