@@ -52,8 +52,8 @@ export function PracticeWorkspace(){
  const [usedPassages,setUsedPassages]=useState<string[]>([]);
  const lesson=LESSONS.find(x=>x.id===lessonId)??LESSONS[0]!,passage=lesson.text;
  const elapsed=startedAt===null?0:Math.max(0,(now-startedAt)/1000),remaining=Math.max(0,60-elapsed);
- const totalWords=passage.trim().split(/\\s+/).filter(Boolean).length;
- const typedWords=typed.trim()?typed.trim().split(/\\s+/).filter(Boolean).length:0;
+ const totalWords=passage.trim().split(/\s+/).filter(Boolean).length;
+ const typedWords=typed.trim()?typed.trim().split(/\s+/).filter(Boolean).length:0;
  const missionEstimate=Math.max(15,Math.ceil(totalWords/40*60));
  const missionRemaining=Math.max(0,missionEstimate-elapsed);
  const formatClock=(seconds:number)=>`${Math.floor(seconds/60).toString().padStart(2,"0")}:${Math.floor(seconds%60).toString().padStart(2,"0")}`;
