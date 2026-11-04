@@ -47,6 +47,7 @@ type View="practice"|"learn"|"insights"; type Mode="practice"|"speed";
 type Session={date:string;wpm:number;accuracy:number;mode:Mode};
 export function PracticeWorkspace(){
  const [view,setView]=useState<View>("practice"),[mode,setMode]=useState<Mode>("practice"),[lessonId,setLessonId]=useState("focus");
+ const [theme,setTheme]=useState<"dark"|"light">("dark");
  const [typed,setTyped]=useState(""),[startedAt,setStartedAt]=useState<number|null>(null),[now,setNow]=useState(Date.now()),[finished,setFinished]=useState(false);
  const [sessions,setSessions]=useState<Session[]>([]),[loaded,setLoaded]=useState(false);
  const [usedPassages,setUsedPassages]=useState<string[]>([]);
@@ -60,7 +61,7 @@ export function PracticeWorkspace(){
  const metrics=useMemo(()=>calculateLiveMetrics(passage,typed,elapsed),[passage,typed,elapsed]);
  const complete=finished||(mode==="practice"&&typed.length>=passage.length);
  const missionRank=metrics.accuracy>=98&&metrics.wpm>=60?"S":metrics.accuracy>=95?"A":metrics.accuracy>=90?"B":"C";
- useEffect(()=>{try{const value=localStorage.getItem("typenova:sessions");if(value)setSessions(JSON.parse(value) as Session[]);const used=localStorage.getItem("typenova:used-passages");if(used)setUsedPassages(JSON.parse(used) as string[])}catch{}setLoaded(true)},[]);
+ useEffect(()=>{try{const savedTheme=localStorage.getItem("typenova:theme");if(savedTheme==="light"||savedTheme==="dark")setTheme(savedTheme);const value=localStorage.getItem("typenova:sessions");if(value)setSessions(JSON.parse(value) as Session[]);const used=localStorage.getItem("typenova:used-passages");if(used)setUsedPassages(JSON.parse(used) as string[])}catch{}setLoaded(true)},[]);
  useEffect(()=>{if(startedAt===null||finished)return;const id=window.setInterval(()=>setNow(Date.now()),200);return()=>window.clearInterval(id)},[startedAt,finished]);
  function finish(){if(finished)return;if(typed.length){const result=calculateLiveMetrics(passage,typed,elapsed);const row:Session={date:new Date().toISOString(),wpm:result.wpm,accuracy:result.accuracy,mode};setSessions(old=>{const next=[row,...old].slice(0,100);try{localStorage.setItem("typenova:sessions",JSON.stringify(next))}catch{}return next})}setFinished(true)}
  useEffect(()=>{if(mode==="speed"&&startedAt!==null&&remaining<=0&&!finished)finish()},[mode,startedAt,remaining,finished]);
@@ -80,7 +81,8 @@ export function PracticeWorkspace(){
  const hour=new Date().getHours(),arc=hour<6?"NIGHT ARC":hour<12?"MORNING ARC":hour<18?"AFTERNOON ARC":"EVENING ARC";
  const chars=passage.split("").map((c,i)=>{const v=typed[i],state=v===undefined?(i===typed.length?"current":"pending"):v===c?"correct":"incorrect";return <span className={"letter letter--"+state} key={i}>{c}</span>});
  const best=sessions.length?Math.max(...sessions.map(x=>x.wpm)):0,avg=sessions.length?Math.round(sessions.reduce((a,x)=>a+x.accuracy,0)/sessions.length):0;
- return <main className="app-shell"><aside className="sidebar">
+ function toggleTheme(){setTheme(current=>{const next=current==="dark"?"light":"dark";try{localStorage.setItem("typenova:theme",next)}catch{}return next})}
+ return <main className="app-shell" data-theme={theme}><aside className="sidebar">
   <a className="brand" href="#home" onClick={e=>{e.preventDefault();setView("practice")}}><span className="brand-mark">N</span><span>Type<span className="brand-accent">Nova</span></span></a>
   <div className="side-label">YOUR UNIVERSE</div><nav className="nav-list" aria-label="Main navigation">
    <button className={"nav-item "+(view==="practice"?"nav-item--active":"")} onClick={()=>setView("practice")}>⌁ Practice</button>
@@ -88,7 +90,7 @@ export function PracticeWorkspace(){
    <button className={"nav-item "+(view==="insights"?"nav-item--active":"")} onClick={()=>setView("insights")}>◈ My progress</button>
   </nav><div className="sidebar-art"><div className="orbit orbit-a"/><div className="orbit orbit-b"/><div className="moon">✦</div><div className="art-caption">LEVEL UP<br/><b>EVERY DAY</b></div></div>
   <div className="sidebar-bottom"><div className="avatar">G</div><div><strong>Guest learner</strong><span>Saved on this device</span></div><i className="online-dot"/></div>
- </aside><section className="main-area"><header className="topbar"><div className="breadcrumb">TYPENOVA <span>/</span> {view==="practice"?"TRAINING ROOM":view==="learn"?"LEARNING PATH":"YOUR PROGRESS"}</div><div className="top-pill"><i className="status-dot"/> SYSTEM ONLINE</div></header>
+ </aside><section className="main-area"><header className="topbar"><div className="breadcrumb">TYPENOVA <span>/</span> {view==="practice"?"TRAINING ROOM":view==="learn"?"LEARNING PATH":"YOUR PROGRESS"}</div><div className="topbar-actions"><button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={theme==="dark"?"Switch to light mode":"Switch to dark mode"} title={theme==="dark"?"Switch to light mode":"Switch to dark mode"}><span className="theme-toggle-icon">{theme==="dark"?"☀":"☾"}</span><span>{theme==="dark"?"LIGHT MODE":"DARK MODE"}</span></button><div className="top-pill"><i className="status-dot"/> SYSTEM ONLINE</div></div></header>
  {view==="practice"&&<><section className="hero-row"><div className="hero-copy"><p className="eyebrow">✦ YOUR TRAINING ARC STARTS HERE</p><h1>Become the <span>main character</span><br/>of your own progress.</h1><p className="hero-subtitle">A little practice today. A whole new level tomorrow.</p><div className="hero-actions"><button className="primary-button" onClick={()=>begin("practice")}>Start training ↗</button><button className="outline-button" onClick={()=>setView("learn")}>Explore lessons</button></div></div>
  <div className="hero-visual" aria-label="Anime-inspired character illustration"><div className="visual-ring"/><div className="visual-ring ring-two"/><span className="visual-star star-one">✦</span><span className="visual-star star-two">✧</span><div className="character-halo"/><div className="character"><div className="hair-back"/><div className="face"><i/><i/><b/></div><div className="hair-front"/><div className="collar"/></div><div className="visual-tag">YOUR STORY · CHAPTER 01</div></div></section>
  <div className="section-heading"><div><p className="eyebrow">TRAINING MODULE</p><h2>Choose your challenge</h2></div><span className="subtle-label">FOCUS · FLOW · IMPROVE</span></div>
