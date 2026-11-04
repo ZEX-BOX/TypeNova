@@ -62,6 +62,7 @@ export function PracticeWorkspace(){
  const complete=finished||(mode==="practice"&&typed.length>=passage.length);
  const missionRank=metrics.accuracy>=98&&metrics.wpm>=60?"S":metrics.accuracy>=95?"A":metrics.accuracy>=90?"B":"C";
  useEffect(()=>{try{const savedTheme=localStorage.getItem("typenova:theme");if(savedTheme==="light"||savedTheme==="dark")setTheme(savedTheme);const value=localStorage.getItem("typenova:sessions");if(value)setSessions(JSON.parse(value) as Session[]);const used=localStorage.getItem("typenova:used-passages");if(used)setUsedPassages(JSON.parse(used) as string[])}catch{}setLoaded(true)},[]);
+ useEffect(()=>{document.documentElement.dataset.theme=theme;document.body.dataset.theme=theme},[theme]);
  useEffect(()=>{if(startedAt===null||finished)return;const id=window.setInterval(()=>setNow(Date.now()),200);return()=>window.clearInterval(id)},[startedAt,finished]);
  function finish(){if(finished)return;if(typed.length){const result=calculateLiveMetrics(passage,typed,elapsed);const row:Session={date:new Date().toISOString(),wpm:result.wpm,accuracy:result.accuracy,mode};setSessions(old=>{const next=[row,...old].slice(0,100);try{localStorage.setItem("typenova:sessions",JSON.stringify(next))}catch{}return next})}setFinished(true)}
  useEffect(()=>{if(mode==="speed"&&startedAt!==null&&remaining<=0&&!finished)finish()},[mode,startedAt,remaining,finished]);
