@@ -130,3 +130,31 @@ body:after{width:290px;height:290px;right:4%;bottom:8%;background:#3b9db8;animat
 .nav-item--active{box-shadow:inset 0 1px rgba(255,255,255,.12),inset 3px 0 #b6d49b}
 .brand-accent{color:#b7d49c}
 @media(prefers-reduced-motion:reduce){.hero-visual:before,.hero-visual:after{animation:none!important}}
+
+
+/* TypeNova tactical mission HUD */
+.mission-hud{display:grid;grid-template-columns:minmax(180px,1.5fr) minmax(75px,.55fr) minmax(110px,.8fr) auto;align-items:center;gap:14px;padding:14px 16px;margin:18px 0 12px;border:1px solid rgba(180,211,157,.25);border-radius:14px;background:linear-gradient(110deg,rgba(32,48,37,.72),rgba(12,22,25,.72));box-shadow:inset 0 1px rgba(255,255,255,.08),0 10px 30px rgba(0,0,0,.16);position:relative;overflow:hidden}
+.mission-hud:after{content:"";position:absolute;top:0;bottom:0;width:22%;left:-25%;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(191,225,169,.08),transparent);transform:skewX(-18deg);animation:mission-scan 6s ease-in-out infinite}
+@keyframes mission-scan{0%,35%{left:-25%}75%,100%{left:115%}}
+.mission-ident,.mission-stat,.mission-live{display:flex;flex-direction:column;gap:4px;position:relative;z-index:1}
+.mission-kicker{font-size:8px;letter-spacing:2px;color:#b5d59b;font-weight:800}
+.mission-ident strong{font-family:'Space Grotesk';font-size:12px;letter-spacing:1.3px;color:#f0f5e9}
+.mission-ident small,.mission-stat small{font-size:8px;letter-spacing:1.1px;color:#879b83}
+.mission-stat{padding-left:13px;border-left:1px solid rgba(184,213,165,.2)}
+.mission-stat>span{font-size:8px;letter-spacing:1.4px;color:#91a58b}
+.mission-stat strong{font-family:'Space Grotesk';font-size:20px;color:#e2f1d4;font-variant-numeric:tabular-nums}
+.mission-stat strong i{font-style:normal;font-size:11px;color:#91a58b}
+.mission-live{flex-direction:row;align-items:center;font-size:8px;letter-spacing:1.4px;color:#b9dba4;white-space:nowrap}
+.mission-live i{width:7px;height:7px;border-radius:50%;background:#a8dc84;box-shadow:0 0 12px #9bd879;animation:mission-pulse 1.7s ease-in-out infinite}
+@keyframes mission-pulse{50%{opacity:.35;box-shadow:0 0 3px #9bd879}}
+.mission-victory{position:relative;overflow:hidden;border-color:rgba(187,220,157,.42);background:linear-gradient(110deg,rgba(45,66,43,.78),rgba(22,38,35,.72));box-shadow:inset 0 1px rgba(255,255,255,.12),0 0 35px rgba(119,164,94,.1)}
+.mission-victory:after{content:"";position:absolute;inset:-60%;pointer-events:none;background:conic-gradient(from 0deg,transparent,rgba(191,228,160,.09),transparent 30%);animation:victory-sweep 9s linear infinite}
+@keyframes victory-sweep{to{transform:rotate(360deg)}}
+.mission-victory .victory-icon{font-size:30px;color:#d8f0b8;text-shadow:0 0 22px rgba(190,230,154,.65);animation:victory-star 2.5s ease-in-out infinite}
+@keyframes victory-star{50%{transform:scale(1.16) rotate(9deg);filter:drop-shadow(0 0 10px rgba(201,236,164,.6))}}
+.mission-victory>div{position:relative;z-index:1}
+.mission-victory strong{display:block;margin-top:3px;letter-spacing:1px;color:#edf8e4}
+.mission-victory p{line-height:1.6}
+.mission-victory button{position:relative;z-index:1}
+@media(max-width:600px){.mission-hud{grid-template-columns:1fr 1fr;gap:12px;padding:12px}.mission-ident{grid-column:1/-1}.mission-stat{padding-left:0;border-left:0}.mission-live{justify-self:end;align-self:end}.mission-victory{gap:10px}.mission-victory p{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.mission-hud:after,.mission-live i,.mission-victory:after,.mission-victory .victory-icon{animation:none!important}}
