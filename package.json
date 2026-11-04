@@ -1,1 +1,16 @@
-{"name":"typenova","private":true,"version":"0.1.0","packageManager":"pnpm@10.12.1","engines":{"node":">=20.9.0"},"scripts":{"dev":"pnpm --filter @typenova/web dev","build":"pnpm --filter @typenova/web build","typecheck":"pnpm -r typecheck","test":"pnpm -r test"},"devDependencies":{"typescript":"^5.9.2"}}
+{
+  "name": "typenova",
+  "private": true,
+  "version": "0.1.0",
+  "engines": { "node": ">=20.9.0" },
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "npm run dev --workspace=@typenova/web",
+    "build": "npm run build --workspace=@typenova/web",
+    "typecheck": "npm run typecheck --workspace=@typenova/web",
+    "test": "npm run test --workspace=@typenova/typing-engine"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}
